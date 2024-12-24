@@ -44,9 +44,22 @@ fn main() {
                 if parts.len() < 2 {
                     continue;
                 }
-                let new_dir = Path::new(parts[1]);
-                if let Err(_) = env::set_current_dir(&new_dir) {
-                    println!("cd: {}: No such file or directory", parts[1]);
+                
+                if parts[1] == "~" {
+                    match env::var("HOME") {
+                        Ok(home_str) => {
+                            if let Err(_) = env::set_current_dir(&home_str) {
+                                println!("cd: {}: No such file or directory", parts[1]);
+                            }
+                        },
+                        Err(_) => {
+                            println!("cd: HOME not set");
+                        }
+                    }
+                } else {
+                    if let Err(_) = env::set_current_dir(parts[1]) {
+                        println!("cd: {}: No such file or directory", parts[1]);
+                    }
                 }
             },
             "pwd" => {
