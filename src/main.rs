@@ -26,6 +26,15 @@ fn main() {
             process::exit(0)
         }
 
+        if input.starts_with("echo") {
+            let parts_of_text: Vec<&str> = input.split_whitespace().collect();
+
+            if parts_of_text.len() > 1 {
+                println!("{}", parts_of_text[1..].join(" "));
+                continue;
+            }
+        }
+
         println!("{}: command not found", input);
     }
 }
