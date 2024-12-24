@@ -93,12 +93,8 @@ The project uses standard Rust tooling. Build using:
 cargo build
 ```
 
-## License
-
-[Add your license here]
 
 ## Contributing
 
-[Add contribution guidelines if applicable]
 
 Feel free to submit issues and enhancement requests!
