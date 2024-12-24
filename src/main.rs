@@ -1,5 +1,6 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
+use std::process;
 
 fn main() {
     loop {
@@ -10,6 +11,21 @@ fn main() {
         let stdin = io::stdin();
         let mut input = String::new();
         stdin.read_line(&mut input).unwrap();
-        println!("{}: command not found", input.trim());
+
+        let input = input.trim();
+
+        if input.starts_with("exit") {
+            let parts: Vec<&str> = input.split_whitespace().collect();
+
+            if parts.len() > 1 {
+                if let Ok(code) = parts[1].parse::<i32>() {
+                    process::exit(code);
+                }
+            }
+
+            process::exit(0)
+        }
+
+        println!("{}: command not found", input);
     }
 }
