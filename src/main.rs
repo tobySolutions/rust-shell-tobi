@@ -40,6 +40,15 @@ fn main() {
 
 
         match command {
+            "cd" => {
+                if parts.len() < 2 {
+                    continue;
+                }
+                let new_dir = Path::new(parts[1]);
+                if let Err(_) = env::set_current_dir(&new_dir) {
+                    println!("cd: {}: No such file or directory", parts[1]);
+                }
+            },
             "pwd" => {
                 if let Ok(current_dir) = env::current_dir() {
                     println!("{}", current_dir.display());
