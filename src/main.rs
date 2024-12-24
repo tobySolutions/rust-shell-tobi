@@ -1,6 +1,6 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
-use std::process;
+use std::process::{self, Command};
 use std::env;
 use std::path::Path;
 
@@ -38,43 +38,51 @@ fn main() {
 
         let command = parts[0];
 
-        if command == "type" {
-            if parts.len() < 2 {
-                continue;
-            }
-
-            let cmd_to_check = parts[1];
-
-            match cmd_to_check {
-                "echo" | "exit" | "type" => println!("{} is a shell builtin", cmd_to_check),
-                _ => {
-                    match find_executable(cmd_to_check) {
-                        Some(path) => println!("{} is {}", cmd_to_check, path),
-                        None => println!("{}: not found", cmd_to_check),
+        match command {
+            "type" => {
+                if parts.len() < 2 {
+                    continue;
+                }
+    
+                let cmd_to_check = parts[1];
+    
+                match cmd_to_check {
+                    "echo" | "exit" | "type" => println!("{} is a shell builtin", cmd_to_check),
+                    _ => {
+                        match find_executable(cmd_to_check) {
+                            Some(path) => println!("{} is {}", cmd_to_check, path),
+                            None => println!("{}: not found", cmd_to_check),
+                        }
                     }
                 }
-            }
-
-            continue;
-        }
-
-        if command == "exit" {
-            if parts.len() > 1 {
-                if let Ok(code) = parts[1].parse::<i32>() {
-                    process::exit(code);
+            }, 
+            "exit" => {
+                if parts.len() > 1 {
+                    if let Ok(code) = parts[1].parse::<i32>() {
+                        process::exit(code);
+                    }
+                }
+                process::exit(0)
+            },
+            "echo" => {
+                if parts.len() > 1 {
+                    println!("{}", parts[1..].join(" "));
+                    continue;
+                }
+            },
+            _ => {
+                if let Some(cmd_path) = find_executable(command) {
+                    let output = Command::new(cmd_path)
+                        .args(&parts[1..])
+                        .output()
+                        .unwrap();
+                    
+                    io::stdout().write_all(&output.stdout).unwrap();
+                    io::stderr().write_all(&output.stderr).unwrap();
+                } else {
+                    println!("{}: command not found", command);
                 }
             }
-            process::exit(0)
-        }   
-
-        if command == "echo" {
-            if parts.len() > 1 {
-                println!("{}", parts[1..].join(" "));
-                continue;
-            }
         }
-
-
-        println!("{}: command not found", input);
     }
 }
