@@ -38,7 +38,13 @@ fn main() {
 
         let command = parts[0];
 
+
         match command {
+            "pwd" => {
+                if let Ok(current_dir) = env::current_dir() {
+                    println!("{}", current_dir.display());
+                }
+            },
             "type" => {
                 if parts.len() < 2 {
                     continue;
@@ -47,7 +53,7 @@ fn main() {
                 let cmd_to_check = parts[1];
     
                 match cmd_to_check {
-                    "echo" | "exit" | "type" => println!("{} is a shell builtin", cmd_to_check),
+                    "echo" | "exit" | "type" | "pwd" => println!("{} is a shell builtin", cmd_to_check),
                     _ => {
                         match find_executable(cmd_to_check) {
                             Some(path) => println!("{} is {}", cmd_to_check, path),
