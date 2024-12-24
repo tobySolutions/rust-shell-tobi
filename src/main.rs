@@ -1,6 +1,22 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
 use std::process;
+use std::env;
+use std::path::Path;
+
+
+fn find_executable(cmd: &str) -> Option<String> {
+    let path = env::var("PATH").unwrap_or_default();
+
+    for dir in path.split(":") {
+        let full_path = Path::new(dir).join(cmd);
+
+        if full_path.exists() {
+            return Some(full_path.to_string_lossy().into_owned());
+        }
+    }
+    None
+}
 
 fn main() {
     loop {
@@ -31,7 +47,12 @@ fn main() {
 
             match cmd_to_check {
                 "echo" | "exit" | "type" => println!("{} is a shell builtin", cmd_to_check),
-                _ => println!("{}: not found", cmd_to_check)
+                _ => {
+                    match find_executable(cmd_to_check) {
+                        Some(path) => println!("{} is {}", cmd_to_check, path),
+                        None => println!("{}: not found", cmd_to_check),
+                    }
+                }
             }
 
             continue;
